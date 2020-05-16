@@ -70,22 +70,35 @@ class Player
   def initialize(dictionary, display)
     @dictionary = dictionary
     @display = display
+    @correct_guess = false
   end
 
   def make_a_guess
-    until @display.progress == @dictionary.winning_word.split('')
+    until @correct_guess
+      print "please guess a letter: "
       letter = gets.chomp.downcase.strip
-      # count = @dictionary.winning_word.length
-      puts "hello, it is included"
-      i = 0
-      while i < @display.progress.length
-        if @dictionary.winning_word.split('')[i] == letter
-          @display.progress[i] = letter
+      @display.progress.each_with_index do |space, index|
+        if @dictionary.winning_word[index] == letter
+          @display.progress[index] = letter
         end
-        i += 1
       end
       @display.progress.each { |place| print "#{place} " }; puts
+      check_for_win
     end
+  end
+
+  def check_for_win
+    if @display.progress == @dictionary.winning_word.split('')
+      @correct_guess = true
+      puts "you win!"
+      prompt_to_play_again
+    end
+  end
+
+  def prompt_to_play_again
+    print "would you like to play again? enter Y or N: "
+    answer = gets.chomp.upcase.strip
+    answer == 'Y' ? Game.new : exit
   end
 
   # def load_game
