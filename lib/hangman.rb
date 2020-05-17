@@ -10,7 +10,6 @@ class Game
     @dictionary = Dictionary.new
     @display = Display.new(@dictionary)
     @hangman = Hangman.new(@dictionary, @display)
-    # puts winning_word
     @hangman.show_welcome_message
     @hangman.play
   end
@@ -52,10 +51,7 @@ class Dictionary
   end
 end
 
-# controls display of letters and also
-# count = @dictionary.winning_word.length
-# if number of guesses from Player == count, game over.
-# else, continue (until loop?)
+# controls display of letters and dashes
 class Display
   attr_reader :progress
 
@@ -97,55 +93,75 @@ class Hangman
 
   def play
     until @correct_guess || @num_of_guesses == @allowed_guesses
-      print 'please guess a letter: '
-      @letter_guess = gets.chomp.downcase.strip
+      prompt_for_letter
       @display.progress.each_with_index do |_space, index|
         if @dictionary.winning_word[index] == @letter_guess
           @display.progress[index] = @letter_guess
         end
       end
-      @display.progress.each { |place| print "#{place} ".colorize(:cyan) }
-      puts
-      control_game
+      check_win_increment_guesses
     end
   end
 
-  def control_game
+  def prompt_for_letter
+    display_progress
+    print "\nplease guess a letter: "
+    @letter_guess = gets.chomp.downcase.strip
+    until @letter_guess.match?(/^[a-z]$/)
+      print "\nplease guess a single letter, a thru z: "
+      @letter_guess = gets.chomp.downcase.strip
+    end
+    print '=' * 50
+  end
+
+  def display_progress
+    puts
+    print 'word --> '
+    @display.progress.each { |place| print "#{place} ".colorize(:cyan) }
+    puts
+  end
+
+  def check_win_increment_guesses
+    puts
     @num_of_guesses += 1
     check_for_incorrect_guesses
     check_for_win
-    puts show_remaining_guesses
-  end
-
-  def show_remaining_guesses
-    "remaining_guesses: #{@allowed_guesses - @num_of_guesses}"
+    puts "remaining guesses: #{@allowed_guesses - @num_of_guesses}"
   end
 
   def check_for_incorrect_guesses
-    unless @dictionary.winning_word.include?(@letter_guess)
-      unless @incorrect_guesses.include?(@letter_guess)
-        @incorrect_guesses << @letter_guess
-      end
-      puts "#{@letter_guess} = incorrect".colorize(:red)
-      puts "not included: #{@incorrect_guesses}"
+    display_incorrect unless @dictionary.winning_word.include?(@letter_guess)
+  end
+
+  def display_incorrect
+    unless @incorrect_guesses.include?(@letter_guess)
+      @incorrect_guesses << @letter_guess
     end
+    puts "#{@letter_guess} = incorrect".colorize(:red)
+    puts "not included: #{@incorrect_guesses}"
   end
 
   def check_for_win
     if @display.progress == @dictionary.winning_word.split('')
       @correct_guess = true
-      puts "you win! winning word: #{@dictionary.winning_word.colorize(:cyan)}"
+      puts "\nYou win!"
+      puts "Winning word: #{@dictionary.winning_word.colorize(:cyan)}"
       prompt_to_play_again
     elsif @num_of_guesses == @allowed_guesses
-      puts "sorry, you lose. winning word: #{@dictionary.winning_word.colorize(:cyan)}"
+      puts "\nSorry, you lose."
+      puts "Winning word: #{@dictionary.winning_word.colorize(:cyan)}"
       prompt_to_play_again
     end
   end
 
   def prompt_to_play_again
-    print 'would you like to play again? enter y or n: '
-    answer = gets.chomp.downcase.strip
-    answer == 'y' ? Game.new : exit
+    print "\nWould you like to play again? enter Y or N: ".colorize(:blue)
+    answer = gets.chomp.upcase.strip
+    until answer.match?(/^Y$|^N$/)
+      print "\nplease enter Y or N: "
+      answer = gets.chomp.upcase.strip
+    end
+    answer == 'Y' ? Game.new : exit
   end
 
   # def load_game
