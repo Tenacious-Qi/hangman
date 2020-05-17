@@ -14,7 +14,7 @@ class Game
     @display = display
     @hangman = hangman
     initialize_classes
-    @hangman.show_welcome_message
+    show_welcome_message
     @hangman.play
   end
 
@@ -25,6 +25,7 @@ class Game
   end
 
   def to_yaml
+    puts 'object converted to yaml'
     YAML.dump ({
       :dictionary => @dictionary,
       :display => @display,
@@ -38,16 +39,33 @@ class Game
     # self.new(data[:name], data[:age], data[:gender])
   end
 
-  def winning_word
-    @dictionary.winning_word
+  def show_welcome_message
+    puts <<-HEREDOC
+
+        Welcome to Hangman!
+
+        A secret word has been generated at random.
+        Try to guess the letters of the secret word.
+        If your letter guess is correct, 
+        game will show where that letter occurs in the word.
+        You will only have a few tries before the man is hanged!
+        
+        If at any time you'd like to save your progress,
+        type SAVE instead of guessing a letter.
+
+        Good luck!
+
+    HEREDOC
   end
 
-  def save
-    @hangman.save_game
-  end
-
-  def load
-    @hangman.load_game
+  def self.prompt_to_play_again
+    print "\nWould you like to play again? enter Y or N: ".colorize(:blue)
+    answer = gets.chomp.upcase.strip
+    until answer.match?(/^Y$|^N$/)
+      print "\nplease enter Y or N: "
+      answer = gets.chomp.upcase.strip
+    end
+    answer == 'Y' ? Game.new(@dictionary, @display, @hangman) : exit
   end
 end
 
@@ -84,11 +102,18 @@ class Display
     dashes = @dictionary.winning_word.length
     @progress = Array.new(dashes) { +'_' }
   end
+
+  def show
+    puts
+    print 'word --> '
+    progress.each { |place| print "#{place} ".colorize(:cyan) }
+    puts
+  end
 end
 
 # can make a guess
 # also has option to save the game
-class Hangman
+class Hangman < Game
   def initialize(dictionary, display)
     @dictionary = dictionary
     @display = display
@@ -97,22 +122,6 @@ class Hangman
     @incorrect_guesses = []
     @num_of_guesses = 0
     @allowed_guesses = @dictionary.winning_word.length * 2
-  end
-
-  def show_welcome_message
-    puts <<-HEREDOC
-
-        Welcome to Hangman!
-
-        A secret word has been generated at random.
-        Try to guess the letters of the secret word.
-        If your letter guess is correct, 
-        game will show where that letter occurs in the word.
-        You will only have a few tries before the man is hanged! 
-
-        Good luck!
-
-    HEREDOC
   end
 
   def play
@@ -128,9 +137,10 @@ class Hangman
   end
 
   def prompt_for_letter
-    display_progress
+    @display.show
     print "\nplease guess a letter: "
     @letter_guess = gets.chomp.downcase.strip
+    save_game if @letter_guess == 'save'
     until @letter_guess.match?(/^[a-z]$/)
       print "\nplease guess a single letter, a thru z: "
       @letter_guess = gets.chomp.downcase.strip
@@ -138,23 +148,12 @@ class Hangman
     print '=' * 50
   end
 
-  def display_progress
-    puts
-    print 'word --> '
-    @display.progress.each { |place| print "#{place} ".colorize(:cyan) }
-    puts
-  end
-
   def check_win_increment_guesses
     puts
     @num_of_guesses += 1
-    check_for_incorrect_guesses
+    display_incorrect unless @dictionary.winning_word.include?(@letter_guess)
     check_for_win
     puts "remaining guesses: #{@allowed_guesses - @num_of_guesses}"
-  end
-
-  def check_for_incorrect_guesses
-    display_incorrect unless @dictionary.winning_word.include?(@letter_guess)
   end
 
   def display_incorrect
@@ -170,29 +169,12 @@ class Hangman
       @correct_guess = true
       puts "\nYou win!"
       puts "Winning word: #{@dictionary.winning_word.colorize(:cyan)}"
-      prompt_to_play_again
+      Game.prompt_to_play_again
     elsif @num_of_guesses == @allowed_guesses
       puts "\nSorry, you lose."
       puts "Winning word: #{@dictionary.winning_word.colorize(:cyan)}"
-      prompt_to_play_again
+      Game.prompt_to_play_again
     end
-  end
-
-  def prompt_to_play_again
-    print "\nWould you like to play again? enter Y or N: ".colorize(:blue)
-    answer = gets.chomp.upcase.strip
-    until answer.match?(/^Y$|^N$/)
-      print "\nplease enter Y or N: "
-      answer = gets.chomp.upcase.strip
-    end
-    answer == 'Y' ? Game.new : exit
-  end
-
-  # def load_game
-  # end
-
-  def save_game
-    "yo it saved"
   end
 end
 
