@@ -1,17 +1,41 @@
 # frozen_string_literal: true
 
 require 'colorize'
+require 'yaml'
 
 # when initialized, generate random word
 # controls saving and loading
 # on load, allow option to open one of saved games
 class Game
-  def initialize
+  attr_accessor :dictionary, :display, :hangman
+
+  def initialize(dictionary, display, hangman)
+    @dictionary = dictionary
+    @display = display
+    @hangman = hangman
+    initialize_classes
+    @hangman.show_welcome_message
+    @hangman.play
+  end
+
+  def initialize_classes
     @dictionary = Dictionary.new
     @display = Display.new(@dictionary)
     @hangman = Hangman.new(@dictionary, @display)
-    @hangman.show_welcome_message
-    @hangman.play
+  end
+
+  def to_yaml
+    YAML.dump ({
+      :dictionary => @dictionary,
+      :display => @display,
+      :hangman => @hangman
+    })
+  end
+
+  def self.from_yaml(string)
+    data = YAML.load(string)
+    p data
+    # self.new(data[:name], data[:age], data[:gender])
   end
 
   def winning_word
@@ -167,8 +191,10 @@ class Hangman
   # def load_game
   # end
 
-  # def save_game
-  # end
+  def save_game
+    "yo it saved"
+  end
 end
 
-Game.new
+Game.new(@dictionary, @display, @hangman)
+
