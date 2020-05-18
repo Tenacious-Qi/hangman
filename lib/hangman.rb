@@ -20,7 +20,7 @@ class Game
   # def initialize_classes
   #   @dictionary = Dictionary.new
   #   @display = Display.new(@dictionary)
-  #   @hangman = Hangman.new(@dictionary, @display, self)
+  #   @hangman = Hangman.new(@dictionary, @display)
   # end
 
   def to_yaml
@@ -28,14 +28,13 @@ class Game
     YAML.dump ({
       :dictionary => @dictionary,
       :display => @display,
-      :game => @game
     })
   end
 
   def self.from_yaml(string)
     data = YAML.load(string)
     p data
-    @hangman = Hangman.new(data[:dictionary], data[:display], self)
+    @hangman = Hangman.new(data[:dictionary], data[:display])
     Game.new(data[:dictionary], data[:display], @hangman)
   end
 
@@ -132,10 +131,9 @@ end
 # also has option to save the game
 class Hangman < Game
 
-  def initialize(dictionary, display, game)
+  def initialize(dictionary, display)
     @dictionary = dictionary
     @display = display
-    @game = game
     @letter_guess = ''
     @correct_guess = false
     @incorrect_guesses = []
@@ -200,5 +198,5 @@ end
 
 @dictionary = Dictionary.new
 @display = Display.new(@dictionary)
-@hangman = Hangman.new(@dictionary, @display, self)
+@hangman = Hangman.new(@dictionary, @display)
 Game.new(@dictionary, @display, @hangman)
