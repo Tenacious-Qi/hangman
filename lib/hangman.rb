@@ -20,7 +20,7 @@ class Game
   # def initialize_classes
   #   @dictionary = Dictionary.new
   #   @display = Display.new(@dictionary)
-  #   @hangman = Hangman.new(@dictionary, @display, self)
+  #   @hangman = Hangman.new(@dictionary, @display)
   # end
 
   def to_yaml
@@ -28,15 +28,14 @@ class Game
     YAML.dump ({
       :dictionary => @dictionary,
       :display => @display,
-      :game => @game
+      :self => self
     })
   end
 
   def self.from_yaml(string)
     data = YAML.load(string)
     p data
-    @hangman = Hangman.new(data[:dictionary], data[:display], self)
-    Game.new(data[:dictionary], data[:display], @hangman)
+    Game.new(data[:dictionary], data[:display], data[:self])
   end
 
   def save_game
@@ -58,9 +57,7 @@ class Game
 
   def show_welcome_message
     puts <<-HEREDOC
-
         Welcome to Hangman!
-
         A secret word has been generated at random.
         Try to guess the letters of the secret word.
         If your letter guess is correct, 
@@ -69,9 +66,7 @@ class Game
         
         If at any time you'd like to save your progress,
         type SAVE instead of guessing a letter or type LOAD to load
-
         Good luck!
-
     HEREDOC
   end
 
@@ -132,10 +127,9 @@ end
 # also has option to save the game
 class Hangman < Game
 
-  def initialize(dictionary, display, game)
+  def initialize(dictionary, display)
     @dictionary = dictionary
     @display = display
-    @game = game
     @letter_guess = ''
     @correct_guess = false
     @incorrect_guesses = []
@@ -200,5 +194,5 @@ end
 
 @dictionary = Dictionary.new
 @display = Display.new(@dictionary)
-@hangman = Hangman.new(@dictionary, @display, self)
+@hangman = Hangman.new(@dictionary, @display)
 Game.new(@dictionary, @display, @hangman)

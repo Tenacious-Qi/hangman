@@ -1,27 +1,22 @@
 ---
 :dictionary: &1 !ruby/object:Dictionary
-  winning_word: convener
+  winning_word: umbrage
 :display: &2 !ruby/object:Display
   dictionary: *1
   progress:
   - _
   - _
   - _
-  - _
-  - e
-  - _
-  - e
   - r
-:game: &3 !ruby/object
+  - _
+  - g
+  - _
+:self: !ruby/object:Hangman
   dictionary: *1
   display: *2
-  hangman: !ruby/object:Hangman
-    dictionary: *1
-    display: *2
-    game: *3
-    letter_guess: save
-    correct_guess: false
-    incorrect_guesses:
-    - s
-    num_of_guesses: 3
-    allowed_guesses: 16
+  letter_guess: save
+  correct_guess: false
+  incorrect_guesses:
+  - s
+  num_of_guesses: 3
+  allowed_guesses: 14
