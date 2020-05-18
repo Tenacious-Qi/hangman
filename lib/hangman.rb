@@ -1,7 +1,6 @@
-# frozen_string_literal: true
-
 require 'colorize'
 require 'yaml'
+require 'pry'
 
 # when initialized, generate random word
 # controls saving and loading
@@ -13,16 +12,16 @@ class Game
     @dictionary = dictionary
     @display = display
     @hangman = hangman
-    initialize_classes
+    # initialize_classes
     show_welcome_message
     @hangman.play
   end
 
-  def initialize_classes
-    @dictionary = Dictionary.new
-    @display = Display.new(@dictionary)
-    @hangman = Hangman.new(@dictionary, @display)
-  end
+  # def initialize_classes
+  #   @dictionary = Dictionary.new
+  #   @display = Display.new(@dictionary)
+  #   @hangman = Hangman.new(@dictionary, @display, self)
+  # end
 
   def to_yaml
     puts 'object converted to yaml'
@@ -33,10 +32,27 @@ class Game
     })
   end
 
-  def self.from_yaml(string)
+  def from_yaml(string)
     data = YAML.load(string)
     p data
-    # self.new(data[:name], data[:age], data[:gender])
+    Game.new(data[:dictionary], data[:display], data[:hangman])
+  end
+
+  def save_game
+    serialized = self.to_yaml
+    print "name your game something, e.g. 'game': "
+    fname = gets.chomp.downcase.strip + '.yaml'
+    saved_game = File.open(fname, "w")
+    saved_game.puts serialized
+    saved_game.close
+  end
+
+  def load_game
+    print "type the name of the game you'd like to load: "
+    fname = gets.chomp.downcase.strip + '.yaml'
+    loaded_game = File.open(fname, "r")
+    puts 'your game has loaded'
+    from_yaml(loaded_game)
   end
 
   def show_welcome_message
@@ -51,7 +67,7 @@ class Game
         You will only have a few tries before the man is hanged!
         
         If at any time you'd like to save your progress,
-        type SAVE instead of guessing a letter.
+        type SAVE instead of guessing a letter or type LOAD to load
 
         Good luck!
 
@@ -71,7 +87,7 @@ end
 
 # generates a random word from a .txt file
 class Dictionary
-  attr_reader :winning_word
+  attr_accessor :winning_word
 
   def initialize
     @winning_word = generate_random_word
@@ -114,9 +130,11 @@ end
 # can make a guess
 # also has option to save the game
 class Hangman < Game
-  def initialize(dictionary, display)
+
+  def initialize(dictionary, display, game)
     @dictionary = dictionary
     @display = display
+    @game = game
     @letter_guess = ''
     @correct_guess = false
     @incorrect_guesses = []
@@ -141,16 +159,17 @@ class Hangman < Game
     print "\nplease guess a letter: "
     @letter_guess = gets.chomp.downcase.strip
     save_game if @letter_guess == 'save'
-    until @letter_guess.match?(/^[a-z]$/)
-      print "\nplease guess a single letter, a thru z: "
-      @letter_guess = gets.chomp.downcase.strip
-    end
+    load_game if @letter_guess == 'load'
+    # until @letter_guess.match?(/^[a-z]$/)
+    #   print "\nplease guess a single letter, a thru z: "
+    #   @letter_guess = gets.chomp.downcase.strip
+    # end
     print '=' * 50
   end
 
   def check_win_increment_guesses
     puts
-    @num_of_guesses += 1
+    @num_of_guesses += 1 unless @letter_guess == 'save'
     display_incorrect unless @dictionary.winning_word.include?(@letter_guess)
     check_for_win
     puts "remaining guesses: #{@allowed_guesses - @num_of_guesses}"
@@ -178,5 +197,7 @@ class Hangman < Game
   end
 end
 
+@dictionary = Dictionary.new
+@display = Display.new(@dictionary)
+@hangman = Hangman.new(@dictionary, @display, self)
 Game.new(@dictionary, @display, @hangman)
-
