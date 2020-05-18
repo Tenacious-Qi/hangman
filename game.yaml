@@ -1,14 +1,21 @@
 ---
 :dictionary: &1 !ruby/object:Dictionary
+<<<<<<< HEAD
   winning_word: umbrage
 :display: &2 !ruby/object:Display
+=======
+  winning_word: murderously
+:display: !ruby/object:Display
+>>>>>>> 2b272cf07982aeda9013e869e3cbca15dd01befe
   dictionary: *1
   progress:
   - _
   - _
+  - r
   - _
   - r
   - _
+<<<<<<< HEAD
   - g
   - _
 :self: !ruby/object:Hangman
@@ -20,3 +27,11 @@
   - s
   num_of_guesses: 3
   allowed_guesses: 14
+=======
+  - r
+  - _
+  - _
+  - s
+  - _
+  - _
+>>>>>>> 2b272cf07982aeda9013e869e3cbca15dd01befe
