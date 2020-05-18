@@ -28,14 +28,15 @@ class Game
     YAML.dump ({
       :dictionary => @dictionary,
       :display => @display,
-      :hangman => @hangman
+      :game => @game
     })
   end
 
-  def from_yaml(string)
+  def self.from_yaml(string)
     data = YAML.load(string)
     p data
-    Game.new(data[:dictionary], data[:display], data[:hangman])
+    @hangman = Hangman.new(data[:dictionary], data[:display], self)
+    Game.new(data[:dictionary], data[:display], @hangman)
   end
 
   def save_game
@@ -47,7 +48,7 @@ class Game
     saved_game.close
   end
 
-  def load_game
+  def self.load_game
     print "type the name of the game you'd like to load: "
     fname = gets.chomp.downcase.strip + '.yaml'
     loaded_game = File.open(fname, "r")
@@ -159,7 +160,7 @@ class Hangman < Game
     print "\nplease guess a letter: "
     @letter_guess = gets.chomp.downcase.strip
     save_game if @letter_guess == 'save'
-    load_game if @letter_guess == 'load'
+    Game.load_game if @letter_guess == 'load'
     # until @letter_guess.match?(/^[a-z]$/)
     #   print "\nplease guess a single letter, a thru z: "
     #   @letter_guess = gets.chomp.downcase.strip
