@@ -28,7 +28,7 @@ class Game
 
   def prompt_to_load_game
     puts "\nWould you like to start a new game or load a saved one?"
-    print "\nEnter 'N' to play a new game or 'L' to load a save game: "
+    print "\nEnter 'N' to play a new game or 'L' to load a saved game: "
     answer = gets.chomp.upcase.strip
     until answer.match?(/^N$|^L$/)
       print "\nplease enter N or L: "

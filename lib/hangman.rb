@@ -80,5 +80,3 @@ class Hangman < Game
     Game.prompt_to_play_again
   end
 end
-
-Game.new(@dictionary, @display, @hangman)
