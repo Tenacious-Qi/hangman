@@ -27,14 +27,14 @@ class Game
   end
 
   def prompt_to_load_game
-    puts "\nWould you like to load a saved game?"
-    print "\nEnter 'Y' to load a saved game or 'N' to play a new game: "
+    puts "\nWould you like to start a new game or load a saved one?"
+    print "\nEnter 'N' to play a new game or 'L' to load a save game: "
     answer = gets.chomp.upcase.strip
-    until answer.match?(/^Y$|^N$/)
-      print "\nplease enter Y or N: "
+    until answer.match?(/^N$|^L$/)
+      print "\nplease enter N or L: "
       answer = gets.chomp.upcase.strip
     end
-    answer == 'Y' ? Game.load_game : @hangman.play
+    answer == 'N' ? @hangman.play : Game.load_game
   end
 
   def to_yaml
