@@ -63,7 +63,7 @@ class Game
   end
 
   def to_yaml
-    YAML.dump(self: self )
+    YAML.dump(self: self)
   end
 
   def self.from_yaml(string)

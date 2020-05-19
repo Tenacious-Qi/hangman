@@ -42,7 +42,7 @@ class Hangman < Game
     puts "remaining guesses: #{@allowed_guesses - @num_of_guesses}"
     @display.show
     puts
-    print "please enter a letter or guess the entire word: "
+    print 'please enter a letter or guess the entire word: '
     @guess = gets.chomp.downcase.strip
     puts "\nalready there".colorize(:red) if @display.progress.include?(@guess)
   end
@@ -51,7 +51,7 @@ class Hangman < Game
     Game.start_new_game       if @guess == '1'
     Game.load_game            if @guess == '2'
     save_game                 if @guess == '3'
-    Game.show_goodbye_message if @guess == '4'              
+    Game.show_goodbye_message if @guess == '4'
   end
 
   def check_win_increment_guesses
