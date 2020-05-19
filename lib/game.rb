@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-# when initialized, generate random word
-# controls saving and loading
+# starts game. controls saving and loading
 # on load, allow option to open one of saved games
 class Game
   attr_accessor :dictionary, :display
@@ -13,7 +12,7 @@ class Game
     @display = display
     @hangman = hangman
     unless @@loaded_game
-      show_welcome_message
+      Display.show_welcome_message
       initialize_other_classes
       prompt_to_load_game
     end
@@ -65,23 +64,6 @@ class Game
     loaded_game = File.open(fname, 'r')
     puts "\n* Your game has loaded! *".colorize(:magenta)
     from_yaml(loaded_game)
-  end
-
-  def show_welcome_message
-    puts <<-HEREDOC
-        Welcome to Hangman!
-        A secret word has been generated at random.
-        Try to guess the letters of the secret word.
-        You may guess the entire word at any time.
-        If a letter guess is correct, 
-        game will show where that letter occurs in the word.
-        You will only have a few tries before the man is hanged!
-        
-        If at any time you'd like to save your progress,
-        type SAVE instead of guessing a letter.
-        
-        Good luck!
-    HEREDOC
   end
 
   def self.prompt_to_play_again
