@@ -47,13 +47,13 @@ class Hangman < Game
     puts
     @num_of_guesses += 1 unless @guess == 'save'
     unless @dictionary.winning_word.include?(@guess) || @guess == 'save'
-      display_incorrect
+      show_incorrect
       puts "\nremaining guesses: #{@allowed_guesses - @num_of_guesses}"
     end
     check_for_win
   end
 
-  def display_incorrect
+  def show_incorrect
     @incorrect_guesses << @guess unless @incorrect_guesses.include?(@guess)
     print 'incorrect: '
     @incorrect_guesses.each { |guess| print "#{guess} ".colorize(:red) }
@@ -63,21 +63,9 @@ class Hangman < Game
     split_word = @dictionary.winning_word.split('')
     if @display.progress == split_word || @guess == @dictionary.winning_word
       @correct_guess = true
-      show_win_message
+      @display.show_win_message
     elsif @num_of_guesses == @allowed_guesses
-      show_lose_message
+      @display.show_lose_message
     end
-  end
-
-  def show_win_message
-    puts "\n* You win! *\n".colorize(:magenta)
-    puts "Winning word: #{@dictionary.winning_word.colorize(:green)}"
-    Game.prompt_to_play_again
-  end
-
-  def show_lose_message
-    puts "\n* Sorry, you lose. *\n".colorize(:magenta)
-    puts "Winning word: #{@dictionary.winning_word.colorize(:green)}"
-    Game.prompt_to_play_again
   end
 end

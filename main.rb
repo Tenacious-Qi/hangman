@@ -9,9 +9,9 @@ end
 
 require 'yaml'
 require 'colorize'
-require_relative 'game.rb'
-require_relative 'dictionary.rb'
-require_relative 'display.rb'
-require_relative 'hangman.rb'
+require_relative 'lib/game.rb'
+require_relative 'lib/dictionary.rb'
+require_relative 'lib/display.rb'
+require_relative 'lib/hangman.rb'
 
 Game.new(@dictionary, @display, @hangman)

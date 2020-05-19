@@ -37,4 +37,16 @@ class Display
         
     HEREDOC
   end
+
+  def show_win_message
+    puts "\n* You win! *\n".colorize(:magenta)
+    puts "Winning word: #{@dictionary.winning_word.colorize(:green)}"
+    Game.prompt_to_play_again
+  end
+
+  def show_lose_message
+    puts "\n* Sorry, you lose. *\n".colorize(:magenta)
+    puts "Winning word: #{@dictionary.winning_word.colorize(:green)}"
+    Game.prompt_to_play_again
+  end
 end
