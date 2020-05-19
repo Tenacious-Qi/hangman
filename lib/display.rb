@@ -30,8 +30,7 @@ class Display
         game will show where that letter occurs in the word.
         You will only have a few tries before the man is hanged!
         
-        If at any time you'd like to save your progress,
-        type SAVE instead of guessing a letter.
+        Enter [3] to save or [4] to exit at any time instead of guessing.
         
         Good luck!
         

@@ -29,13 +29,18 @@ class Hangman < Game
 
   def prompt_for_letter
     request_letter
-    save_game if @guess == 'save'
-    until @guess.match?(/[a-z*]/)
-      print "\nenter a single letter, guess the entire word, or 'save': "
+    save_or_exit
+    until @guess.match?(/[a-z*]|\b[3-4]\b/)
+      print "\nenter a single letter, guess the entire word. [3] to save. [4] to exit: "
       @guess = gets.chomp.downcase.strip
-      save_game if @guess == 'save'
+      save_or_exit
     end
     print '=' * 50
+  end
+
+  def save_or_exit
+    save_game if @guess == '3'
+    exit if @guess == '4'
   end
 
   def request_letter
@@ -48,7 +53,7 @@ class Hangman < Game
   def check_win_increment_guesses
     puts
     @num_of_guesses += 1 unless @guess == 'save'
-    unless @dictionary.winning_word.include?(@guess) || @guess == 'save'
+    unless @dictionary.winning_word.include?(@guess) || @guess == '3'
       show_incorrect
       puts "\nremaining guesses: #{@allowed_guesses - @num_of_guesses}"
     end

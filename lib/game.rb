@@ -12,8 +12,8 @@ class Game
     @display = display
     @hangman = hangman
     unless @@loaded_game
-      Display.show_welcome_message
       @hangman = Hangman.new(@dictionary, @display)
+      Display.show_welcome_message
       prompt_to_load_game
     end
     @hangman.play
