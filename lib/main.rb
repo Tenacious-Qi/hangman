@@ -3,8 +3,8 @@
 require 'bundler/inline'
 
 gemfile true do
- source 'http://rubygems.org'
- gem 'colorize'
+  source 'http://rubygems.org'
+  gem 'colorize'
 end
 
 require 'yaml'

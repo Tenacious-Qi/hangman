@@ -40,6 +40,7 @@ class Hangman < Game
     @display.show
     print "\nplease enter a letter or guess the entire word: "
     @guess = gets.chomp.downcase.strip
+    puts "\nalready there!".colorize(:red) if @display.progress.include?(@guess)
   end
 
   def check_win_increment_guesses
@@ -47,15 +48,15 @@ class Hangman < Game
     @num_of_guesses += 1 unless @guess == 'save'
     unless @dictionary.winning_word.include?(@guess) || @guess == 'save'
       display_incorrect
-      puts "remaining guesses: #{@allowed_guesses - @num_of_guesses}"
+      puts "\nremaining guesses: #{@allowed_guesses - @num_of_guesses}"
     end
     check_for_win
   end
 
   def display_incorrect
     @incorrect_guesses << @guess unless @incorrect_guesses.include?(@guess)
-    puts "#{@guess} = incorrect".colorize(:red)
-    puts "not included: #{@incorrect_guesses}"
+    print 'incorrect: '
+    @incorrect_guesses.each { |guess| print "#{guess} ".colorize(:red) }
   end
 
   def check_for_win
