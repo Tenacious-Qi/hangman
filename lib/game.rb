@@ -6,39 +6,56 @@ class Game
   attr_accessor :dictionary, :display
 
   @@loaded_game = false
+  @@new_game_requested = false
 
   def initialize(dictionary, display, hangman)
     @dictionary = dictionary
     @display = display
     @hangman = hangman
+    @selected_option = ''
     unless @@loaded_game
       @hangman = Hangman.new(@dictionary, @display)
-      Display.show_welcome_message
-      prompt_to_load_game
+      prompt_to_load_game unless @@new_game_requested
     end
     @hangman.play
   end
 
   def prompt_to_load_game
-    puts "\nWould you like to start a new game or load a saved one?"
-    print "\nEnter [1] to play a new game or [2] to load a saved game: "
-    answer = gets.chomp.upcase.strip
-    until answer.match?(/^1$|^2$/)
-      print "\nplease enter 1 or 2: "
-      answer = gets.chomp.upcase.strip
+    Display.show_options
+    @selected_option = gets.chomp.upcase.strip
+    until @selected_option.match?(/\b[1-4]\b/)
+      print "\nplease enter 1, 2, 3, or 4: "
+      @selected_option = gets.chomp.upcase.strip
     end
-    answer == '1' ? @hangman.play : Game.load_game
+    check_selected_option
   end
 
-  def to_yaml
-    YAML.dump({  dictionary: @dictionary,
-                 display: @display,
-                 self: self })
+  def check_selected_option
+    if @selected_option == '1'
+      Game.start_new_game
+    elsif @selected_option == '2'
+      Game.load_game
+    elsif @selected_option == '3'
+      @hangman.save_game
+    elsif @selected_option == '4'
+      exit
+    end
   end
 
-  def self.from_yaml(string)
-    data = YAML.load(string)
-    Game.new(data[:dictionary], data[:display], data[:self])
+  def self.start_new_game
+    @@new_game_requested = true
+    Display.show_welcome_message
+    @hangman = Hangman.new(@dictionary, @display)
+    Game.new(@dictionary, @display, @hangman)
+  end
+
+  def self.load_game
+    @@loaded_game = true
+    print "\nEnter the name of the game you'd like to load: "
+    fname = gets.chomp.downcase.strip + '.yaml'
+    loaded_game = File.open(fname, 'r')
+    puts "\n* Your game has loaded! *".colorize(:magenta)
+    from_yaml(loaded_game)
   end
 
   def save_game
@@ -51,13 +68,15 @@ class Game
     saved_game.close
   end
 
-  def self.load_game
-    @@loaded_game = true
-    print "\nEnter the name of the game you'd like to load: "
-    fname = gets.chomp.downcase.strip + '.yaml'
-    loaded_game = File.open(fname, 'r')
-    puts "\n* Your game has loaded! *".colorize(:magenta)
-    from_yaml(loaded_game)
+  def to_yaml
+    YAML.dump({  dictionary: @dictionary,
+                 display: @display,
+                 self: self })
+  end
+
+  def self.from_yaml(string)
+    data = YAML.load(string)
+    Game.new(data[:dictionary], data[:display], data[:self])
   end
 
   def self.prompt_to_play_again

@@ -18,6 +18,22 @@ class Display
     puts
   end
 
+  def self.show_options
+    puts <<-HEREDOC
+
+        Hello, hangman enthusiast!
+
+        What would you like to do?
+        
+        Enter [1] to start a new game
+        Enter [2] to load a saved game
+        Enter [3] to save current game
+        Enter [4] to exit current game
+
+    HEREDOC
+    print 'number: '
+  end
+
   def self.show_welcome_message
     puts <<-HEREDOC
 
@@ -30,8 +46,13 @@ class Display
         game will show where that letter occurs in the word.
         You will only have a few tries before the man is hanged!
         
-        Enter [3] to save or [4] to exit at any time instead of guessing.
-        
+        At any time, instead of guessing, you have these options: 
+
+          Enter [1] to start a new game
+          Enter [2] to load a saved game
+          Enter [3] to save current game
+          Enter [4] to exit current game
+
         Good luck!
         
     HEREDOC
