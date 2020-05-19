@@ -1,83 +1,105 @@
 require 'colorize'
 require 'yaml'
-require 'pry'
+# frozen_string_literal = true
+$loaded_game = false
 
 # when initialized, generate random word
 # controls saving and loading
 # on load, allow option to open one of saved games
 class Game
-  attr_accessor :dictionary, :display, :hangman
+  attr_accessor :dictionary, :display
 
   def initialize(dictionary, display, hangman)
     @dictionary = dictionary
     @display = display
     @hangman = hangman
-    # initialize_classes
-    show_welcome_message
+    unless $loaded_game
+      show_welcome_message
+      initialize_other_classes
+      prompt_to_load_game
+    end
     @hangman.play
   end
 
-  # def initialize_classes
-  #   @dictionary = Dictionary.new
-  #   @display = Display.new(@dictionary)
-  #   @hangman = Hangman.new(@dictionary, @display)
-  # end
-
-  def to_yaml
-    puts 'object converted to yaml'
-    YAML.dump ({
-      :dictionary => @dictionary,
-      :display => @display,
-      :self => self
-    })
+  def initialize_other_classes
+    @dictionary = Dictionary.new
+    @display = Display.new(@dictionary)
+    @hangman = Hangman.new(@dictionary, @display)
   end
 
-  def self.from_yaml(string)
-    data = YAML.load(string)
-    p data
-    Game.new(data[:dictionary], data[:display], data[:self])
-  end
-
-  def save_game
-    serialized = self.to_yaml
-    print "name your game something, e.g. 'game': "
-    fname = gets.chomp.downcase.strip + '.yaml'
-    saved_game = File.open(fname, "w")
-    saved_game.puts serialized
-    saved_game.close
-  end
-
-  def self.load_game
-    print "type the name of the game you'd like to load: "
-    fname = gets.chomp.downcase.strip + '.yaml'
-    loaded_game = File.open(fname, "r")
-    puts 'your game has loaded'
-    from_yaml(loaded_game)
-  end
-
-  def show_welcome_message
-    puts <<-HEREDOC
-        Welcome to Hangman!
-        A secret word has been generated at random.
-        Try to guess the letters of the secret word.
-        If your letter guess is correct, 
-        game will show where that letter occurs in the word.
-        You will only have a few tries before the man is hanged!
-        
-        If at any time you'd like to save your progress,
-        type SAVE instead of guessing a letter or type LOAD to load
-        Good luck!
-    HEREDOC
-  end
-
-  def self.prompt_to_play_again
-    print "\nWould you like to play again? enter Y or N: ".colorize(:blue)
+  def prompt_to_load_game
+    puts "\nWould you like to load a saved game?"
+    print "\nEnter 'Y' to load a saved game or 'N' to play a new game: "
     answer = gets.chomp.upcase.strip
     until answer.match?(/^Y$|^N$/)
       print "\nplease enter Y or N: "
       answer = gets.chomp.upcase.strip
     end
-    answer == 'Y' ? Game.new(@dictionary, @display, @hangman) : exit
+    answer == 'Y' ? Game.load_game : @hangman.play
+  end
+
+  def to_yaml
+    YAML.dump ({
+        :dictionary =>  @dictionary,
+        :display    => @display,
+        :self       => self
+    })
+  end
+
+  def self.from_yaml(string)
+    data = YAML.safe_load(string)
+    Game.new(data[:dictionary], data[:display], data[:self])
+  end
+
+  def save_game
+    serialized = to_yaml
+    print "\nName your game something, e.g. 'game': "
+    fname = gets.chomp.downcase.strip + '.yaml'
+    saved_game = File.open(fname, 'w')
+    puts "\n* Your game has been saved * ".colorize(:magenta)
+    saved_game.puts serialized
+    saved_game.close
+  end
+
+  def self.load_game
+    $loaded_game = true
+    print "\nEnter the name of the game you'd like to load: "
+    fname = gets.chomp.downcase.strip + '.yaml'
+    loaded_game = File.open(fname, 'r')
+    puts "\n* Your game has loaded! *".colorize(:magenta)
+    from_yaml(loaded_game)
+  end
+
+  def show_welcome_message
+    puts <<-HEREDOC
+
+        Welcome to Hangman!
+
+        A secret word has been generated at random.
+        Try to guess the letters of the secret word.
+        You may guess the entire word at any time.
+        If a letter guess is correct, 
+        game will show where that letter occurs in the word.
+
+        You will only have a few tries before the man is hanged!
+        
+        If at any time you'd like to save your progress,
+        type SAVE instead of guessing a letter.
+        
+        Good luck!
+
+    HEREDOC
+  end
+
+  def self.prompt_to_play_again
+    print "\nWould you like to play again? enter Y or N: ".colorize(:magenta)
+    answer = gets.chomp.upcase.strip
+    until answer.match?(/^Y$|^N$/)
+      print "\nplease enter Y or N: "
+      answer = gets.chomp.upcase.strip
+    end
+    $loaded_game = false #starting new game, option to load after
+    answer == 'Y' ? new(@dictionary, @display, @hangman) : exit
   end
 end
 
@@ -118,7 +140,7 @@ class Display
   def show
     puts
     print 'word --> '
-    progress.each { |place| print "#{place} ".colorize(:cyan) }
+    progress.each { |place| print "#{place} ".colorize(:green) }
     puts
   end
 end
@@ -126,7 +148,6 @@ end
 # can make a guess
 # also has option to save the game
 class Hangman < Game
-
   def initialize(dictionary, display)
     @dictionary = dictionary
     @display = display
@@ -151,23 +172,25 @@ class Hangman < Game
 
   def prompt_for_letter
     @display.show
-    print "\nplease guess a letter: "
+    print "\nplease enter a letter or guess the entire word: "
     @letter_guess = gets.chomp.downcase.strip
     save_game if @letter_guess == 'save'
-    Game.load_game if @letter_guess == 'load'
-    # until @letter_guess.match?(/^[a-z]$/)
-    #   print "\nplease guess a single letter, a thru z: "
-    #   @letter_guess = gets.chomp.downcase.strip
-    # end
-    print '=' * 50
+    until @letter_guess.match?(/[a-z*]/)
+      print "\nenter a single letter, guess the entire word, or 'save': "
+      @letter_guess = gets.chomp.downcase.strip
+      save_game if @letter_guess == 'save'
+    end
+    print '=' * 50 unless @letter_guess == 'save'
   end
 
   def check_win_increment_guesses
     puts
     @num_of_guesses += 1 unless @letter_guess == 'save'
-    display_incorrect unless @dictionary.winning_word.include?(@letter_guess)
+    unless @dictionary.winning_word.include?(@letter_guess) || @letter_guess == 'save'
+      display_incorrect
+      puts "remaining guesses: #{@allowed_guesses - @num_of_guesses}"
+    end
     check_for_win
-    puts "remaining guesses: #{@allowed_guesses - @num_of_guesses}"
   end
 
   def display_incorrect
@@ -179,20 +202,17 @@ class Hangman < Game
   end
 
   def check_for_win
-    if @display.progress == @dictionary.winning_word.split('')
+    if @display.progress == @dictionary.winning_word.split('') || @letter_guess == @dictionary.winning_word
       @correct_guess = true
-      puts "\nYou win!"
-      puts "Winning word: #{@dictionary.winning_word.colorize(:cyan)}"
+      puts "\n* You win! *\n".colorize(:magenta)
+      puts "Winning word: #{@dictionary.winning_word.colorize(:green)}"
       Game.prompt_to_play_again
     elsif @num_of_guesses == @allowed_guesses
-      puts "\nSorry, you lose."
-      puts "Winning word: #{@dictionary.winning_word.colorize(:cyan)}"
+      puts "\n* Sorry, you lose. *\n".colorize(:magenta)
+      puts "Winning word: #{@dictionary.winning_word.colorize(:green)}"
       Game.prompt_to_play_again
     end
   end
 end
 
-@dictionary = Dictionary.new
-@display = Display.new(@dictionary)
-@hangman = Hangman.new(@dictionary, @display)
 Game.new(@dictionary, @display, @hangman)
