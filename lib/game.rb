@@ -13,16 +13,10 @@ class Game
     @hangman = hangman
     unless @@loaded_game
       Display.show_welcome_message
-      initialize_other_classes
+      @hangman = Hangman.new(@dictionary, @display)
       prompt_to_load_game
     end
     @hangman.play
-  end
-
-  def initialize_other_classes
-    @dictionary = Dictionary.new
-    @display = Display.new(@dictionary)
-    @hangman = Hangman.new(@dictionary, @display)
   end
 
   def prompt_to_load_game

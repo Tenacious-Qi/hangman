@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
-# can make a guess
+# controls logic of hangman. player makes guesses. feedback provided.
 # also has option to save the game
 class Hangman < Game
   def initialize(dictionary, display)
     @dictionary = dictionary
     @display = display
+    @dictionary = Dictionary.new
+    @display = Display.new(@dictionary)
     @guess = ''
     @correct_guess = false
     @incorrect_guesses = []
