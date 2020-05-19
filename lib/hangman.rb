@@ -39,17 +39,19 @@ class Hangman < Game
   end
 
   def request_letter
+    puts "remaining guesses: #{@allowed_guesses - @num_of_guesses}"
     @display.show
-    print "\nplease enter a letter or guess the entire word: "
+    puts
+    print "please enter a letter or guess the entire word: "
     @guess = gets.chomp.downcase.strip
     puts "\nalready there".colorize(:red) if @display.progress.include?(@guess)
   end
 
   def new_load_save_or_exit
-    Game.start_new_game if @guess == '1'
-    Game.load_game if @guess == '2'
-    save_game if @guess == '3'
-    exit if @guess == '4'
+    Game.start_new_game       if @guess == '1'
+    Game.load_game            if @guess == '2'
+    save_game                 if @guess == '3'
+    Game.show_goodbye_message if @guess == '4'              
   end
 
   def check_win_increment_guesses
@@ -57,15 +59,16 @@ class Hangman < Game
     @num_of_guesses += 1 unless @guess == 'save'
     unless @dictionary.winning_word.include?(@guess) || @guess == '3'
       show_incorrect
-      puts "\nremaining guesses: #{@allowed_guesses - @num_of_guesses}"
     end
     check_for_win
   end
 
   def show_incorrect
     @incorrect_guesses << @guess unless @incorrect_guesses.include?(@guess)
-    print 'incorrect: '
+    puts
+    print 'incorrect guesses: '
     @incorrect_guesses.each { |guess| print "#{guess} ".colorize(:red) }
+    puts
   end
 
   def check_for_win

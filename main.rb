@@ -15,4 +15,4 @@ require_relative 'lib/dictionary.rb'
 require_relative 'lib/display.rb'
 require_relative 'lib/hangman.rb'
 
-Game.new(@dictionary, @display, @hangman)
+Game.new(@hangman)

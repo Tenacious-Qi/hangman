@@ -40,8 +40,8 @@ class Display
         Welcome to Hangman!
 
         A secret word has been generated at random.
-        Try to guess the letters of the secret word.
-        You may guess the entire word at any time.
+        *Try to guess the letters of the secret word.*
+        *You may guess the entire word at any time.*
         If a letter guess is correct, 
         game will show where that letter occurs in the word.
         You will only have a few tries before the man is hanged!

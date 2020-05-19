@@ -8,9 +8,7 @@ class Game
   @@loaded_game = false
   @@new_game_requested = false
 
-  def initialize(dictionary, display, hangman)
-    @dictionary = dictionary
-    @display = display
+  def initialize(hangman)
     @hangman = hangman
     @selected_option = ''
     unless @@loaded_game
@@ -31,10 +29,10 @@ class Game
   end
 
   def check_selected_option
-    Game.start_new_game if @selected_option == '1'
-    Game.load_game if @selected_option == '2'
-    @hangman.save_game if @selected_option == '3'
-    exit if @selected_option == '4'
+    Game.start_new_game       if @selected_option == '1'
+    Game.load_game            if @selected_option == '2'
+    @hangman.save_game        if @selected_option == '3'
+    Game.show_goodbye_message if @selected_option == '4'
   end
 
   def self.start_new_game
@@ -42,7 +40,7 @@ class Game
     puts "\n\t* New game started! *\n".colorize(:magenta)
     Display.show_welcome_message
     @hangman = Hangman.new(@dictionary, @display)
-    Game.new(@dictionary, @display, @hangman)
+    Game.new(@hangman)
   end
 
   def self.load_game
@@ -65,14 +63,12 @@ class Game
   end
 
   def to_yaml
-    YAML.dump({  dictionary: @dictionary,
-                 display: @display,
-                 self: self })
+    YAML.dump(self: self )
   end
 
   def self.from_yaml(string)
     data = YAML.load(string)
-    Game.new(data[:dictionary], data[:display], data[:self])
+    Game.new(data[:self])
   end
 
   def self.prompt_to_play_again
@@ -83,6 +79,11 @@ class Game
       answer = gets.chomp.upcase.strip
     end
     @@loaded_game = false # starting new game, option to load after
-    answer == 'Y' ? new(@dictionary, @display, @hangman) : exit
+    answer == 'Y' ? Game.start_new_game : exit
+  end
+
+  def self.show_goodbye_message
+    puts "\n* Goodbye, thanks for playing! *\n".colorize(:magenta)
+    exit
   end
 end
