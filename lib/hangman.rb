@@ -26,12 +26,12 @@ class Hangman < Game
       check_win_increment_guesses
     end
   end
-  
+
   def prompt_for_letter
     request_letter
     new_load_save_or_exit
     until @guess.match?(/[a-z*]|\b[1-4]\b/)
-      print "\nenter a single letter, guess the entire word. [3] to save. [4] to exit: "
+      print "\nenter a single letter (a-z), 1-4, or guess the entire word: "
       @guess = gets.chomp.downcase.strip
       new_load_save_or_exit
     end
@@ -42,7 +42,7 @@ class Hangman < Game
     @display.show
     print "\nplease enter a letter or guess the entire word: "
     @guess = gets.chomp.downcase.strip
-    puts "\nalready there!".colorize(:red) if @display.progress.include?(@guess)
+    puts "\nalready there".colorize(:red) if @display.progress.include?(@guess)
   end
 
   def new_load_save_or_exit

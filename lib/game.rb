@@ -31,19 +31,15 @@ class Game
   end
 
   def check_selected_option
-    if @selected_option == '1'
-      Game.start_new_game
-    elsif @selected_option == '2'
-      Game.load_game
-    elsif @selected_option == '3'
-      @hangman.save_game
-    elsif @selected_option == '4'
-      exit
-    end
+    Game.start_new_game if @selected_option == '1'
+    Game.load_game if @selected_option == '2'
+    @hangman.save_game if @selected_option == '3'
+    exit if @selected_option == '4'
   end
 
   def self.start_new_game
     @@new_game_requested = true
+    puts "\n\t* New game started! *\n".colorize(:magenta)
     Display.show_welcome_message
     @hangman = Hangman.new(@dictionary, @display)
     Game.new(@dictionary, @display, @hangman)
