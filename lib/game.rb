@@ -3,16 +3,20 @@
 # starts game. controls saving and loading
 # on load, allow option to open one of saved games
 class Game
-  @@loaded_game = false
-  @@new_game_requested = false
+  @loaded_game = false
+  @new_game_requested = false
+
+  class << self
+    attr_accessor :loaded_game, :new_game_requested
+  end
 
   def initialize(hangman)
     @hangman = hangman
     @selected_option = ''
     @avail_games = []
-    unless @@loaded_game
+    unless self.class.loaded_game
       @hangman = Hangman.new(@dictionary, @display)
-      prompt_with_options unless @@new_game_requested
+      prompt_with_options unless self.class.new_game_requested
     end
     @hangman.play
   end
@@ -22,7 +26,7 @@ class Game
     @selected_option = gets.chomp.upcase.strip
     until @selected_option.match?(/\b[1-4]\b/)
       print "\nplease enter 1, 2, 3, or 4: "
-      @selected_option = gets.chomp.upcase.strip
+      @selected_option = gets.chomp.strip
     end
     check_selected_option
   end
@@ -35,7 +39,7 @@ class Game
   end
 
   def self.start_new_game
-    @@new_game_requested = true
+    self.new_game_requested = true
     puts "\n\t* New game started! *\n".colorize(:magenta)
     Display.show_welcome_message
     @hangman = Hangman.new(@dictionary, @display)
@@ -54,7 +58,7 @@ class Game
   end
 
   def self.load_game
-    @@loaded_game = true
+    self.loaded_game = true
     puts "\nSaved Games:".colorize(:magenta)
     yaml_files = File.join('**', '*.yaml')
     @avail_games = Dir.glob(yaml_files, base: 'saved_games')
@@ -70,12 +74,12 @@ class Game
     show_available_games
     fname = gets.chomp.downcase.strip + '.yaml'
     unless @avail_games.include?(fname)
-      puts "\n* filename not found *".colorize(:magenta)
+      puts "\n* that game isn't here! *".colorize(:magenta)
       prompt_to_play_again
     end
-    loaded_game = File.open("saved_games/#{fname}", 'r')
+    selected_game = File.open("saved_games/#{fname}", 'r')
     puts "\n* Your game has loaded! *\n".colorize(:magenta)
-    from_yaml(loaded_game)
+    from_yaml(selected_game)
   end
 
   def self.show_available_games
@@ -99,12 +103,7 @@ class Game
       print "\nplease enter Y or N: "
       answer = gets.chomp.upcase.strip
     end
-    @@loaded_game = false # starting new game, option to load after
-    if answer == 'Y'
-      start_new_game
-    else
-      Display.show_goodbye_message
-      exit
-    end
+    self.loaded_game = false # starting new game, option to load after
+    answer == 'Y' ? start_new_game : Display.show_goodbye_message
   end
 end

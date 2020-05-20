@@ -1,7 +1,7 @@
 ---
 :self: !ruby/object:Hangman
   dictionary: &1 !ruby/object:Dictionary
-    winning_word: antrim
+    winning_word: alabaster
   display: !ruby/object:Display
     dictionary: *1
     progress:
@@ -11,9 +11,11 @@
     - _
     - _
     - _
-  guess: '3'
+    - _
+    - _
+    - _
+  guess: ''
   correct_guess: false
-  incorrect_guesses:
-  - g
+  incorrect_guesses: []
   num_of_guesses: 0
-  allowed_guesses: 12
+  allowed_guesses: 18
