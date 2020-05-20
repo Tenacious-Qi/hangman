@@ -1,0 +1,22 @@
+---
+:self: !ruby/object:Hangman
+  dictionary: &1 !ruby/object:Dictionary
+    winning_word: feebly
+  display: !ruby/object:Display
+    dictionary: *1
+    progress:
+    - _
+    - e
+    - e
+    - _
+    - l
+    - _
+  guess: '3'
+  correct_guess: false
+  incorrect_guesses:
+  - s
+  - r
+  - t
+  - n
+  num_of_guesses: 5
+  allowed_guesses: 12

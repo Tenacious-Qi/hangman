@@ -1,0 +1,24 @@
+---
+:self: !ruby/object:Hangman
+  dictionary: &1 !ruby/object:Dictionary
+    winning_word: halftrack
+  display: !ruby/object:Display
+    dictionary: *1
+    progress:
+    - _
+    - a
+    - l
+    - _
+    - t
+    - r
+    - a
+    - _
+    - _
+  guess: '3'
+  correct_guess: false
+  incorrect_guesses:
+  - s
+  - n
+  - e
+  num_of_guesses: 6
+  allowed_guesses: 18
