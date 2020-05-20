@@ -57,7 +57,7 @@ class Hangman < Game
 
   def check_win_increment_guesses
     puts
-    @num_of_guesses += 1 unless @guess == 'save'
+    @num_of_guesses += 1 unless @guess == '3'
     unless @dictionary.winning_word.include?(@guess) || @guess == '3'
       show_incorrect
     end
