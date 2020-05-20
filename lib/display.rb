@@ -21,7 +21,7 @@ class Display
   def self.show_options
     puts <<-HEREDOC
 
-        Hello, hangman enthusiast!
+        Hello, welcome to hangman!
 
         What would you like to do?
         
