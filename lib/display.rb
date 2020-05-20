@@ -31,7 +31,7 @@ class Display
         Enter [4] to exit current game
 
     HEREDOC
-    print 'number: '
+    print 'option: '
   end
 
   def self.show_welcome_message
@@ -68,5 +68,10 @@ class Display
     puts "\n* Sorry, you lose. *\n".colorize(:magenta)
     puts "Winning word: #{@dictionary.winning_word.colorize(:green)}"
     Game.prompt_to_play_again
+  end
+
+  def self.show_goodbye_message
+    puts "\n* Goodbye, thanks for playing! *\n".colorize(:magenta)
+    exit
   end
 end

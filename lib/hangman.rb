@@ -48,10 +48,11 @@ class Hangman < Game
   end
 
   def new_load_save_or_exit
+    @num_of_guesses -= 1 if @guess.match?(/\b[1-4]\b/)
     Game.start_new_game       if @guess == '1'
     Game.load_game            if @guess == '2'
     save_game                 if @guess == '3'
-    Game.show_goodbye_message if @guess == '4'
+    Display.show_goodbye_message if @guess == '4'
   end
 
   def check_win_increment_guesses

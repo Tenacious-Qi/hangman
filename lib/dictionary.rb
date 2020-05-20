@@ -10,7 +10,7 @@ class Dictionary
 
   def playable_words
     File.open('lib/5desk.txt', 'r') do |file|
-      words = file.readlines.map { |word| word.strip }
+      words = file.readlines.map(&:strip)
       words_to_use = words.select do |word|
         word.length > 4 && word.length < 13
       end

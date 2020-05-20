@@ -3,22 +3,21 @@
 # starts game. controls saving and loading
 # on load, allow option to open one of saved games
 class Game
-  attr_accessor :dictionary, :display
-
   @@loaded_game = false
   @@new_game_requested = false
 
   def initialize(hangman)
     @hangman = hangman
     @selected_option = ''
+    @avail_games = []
     unless @@loaded_game
       @hangman = Hangman.new(@dictionary, @display)
-      prompt_to_load_game unless @@new_game_requested
+      prompt_with_options unless @@new_game_requested
     end
     @hangman.play
   end
 
-  def prompt_to_load_game
+  def prompt_with_options
     Display.show_options
     @selected_option = gets.chomp.upcase.strip
     until @selected_option.match?(/\b[1-4]\b/)
@@ -29,10 +28,10 @@ class Game
   end
 
   def check_selected_option
-    Game.start_new_game       if @selected_option == '1'
-    Game.load_game            if @selected_option == '2'
-    @hangman.save_game        if @selected_option == '3'
-    Game.show_goodbye_message if @selected_option == '4'
+    Game.start_new_game          if @selected_option == '1'
+    Game.load_game               if @selected_option == '2'
+    @hangman.save_game           if @selected_option == '3'
+    Display.show_goodbye_message if @selected_option == '4'
   end
 
   def self.start_new_game
@@ -43,23 +42,45 @@ class Game
     Game.new(@hangman)
   end
 
-  def self.load_game
-    @@loaded_game = true
-    print "\nEnter the name of the game you'd like to load: "
-    fname = gets.chomp.downcase.strip + '.yaml'
-    loaded_game = File.open(fname, 'r')
-    puts "\n* Your game has loaded! *".colorize(:magenta)
-    from_yaml(loaded_game)
-  end
-
   def save_game
     serialized = to_yaml
     print "\nName your game something, e.g. 'game': "
     fname = gets.chomp.downcase.strip + '.yaml'
-    saved_game = File.open(fname, 'w')
+    Dir.mkdir('saved_games') unless File.exist?('saved_games')
+    saved_game = File.open("saved_games/#{fname}", 'w')
     puts "\n* Your game has been saved * ".colorize(:magenta)
     saved_game.puts serialized
     saved_game.close
+  end
+
+  def self.load_game
+    @@loaded_game = true
+    puts "\nSaved Games:".colorize(:magenta)
+    yaml_files = File.join('**', '*.yaml')
+    @avail_games = Dir.glob(yaml_files, base: 'saved_games')
+    if @avail_games.empty?
+      puts ' * No saved games found! *'.colorize(:magenta)
+      prompt_to_play_again
+    else
+      list_and_load_game
+    end
+  end
+
+  def self.list_and_load_game
+    show_available_games
+    fname = gets.chomp.downcase.strip + '.yaml'
+    unless @avail_games.include?(fname)
+      puts "\n* filename not found *".colorize(:magenta)
+      prompt_to_play_again
+    end
+    loaded_game = File.open("saved_games/#{fname}", 'r')
+    puts "\n* Your game has loaded! *\n".colorize(:magenta)
+    from_yaml(loaded_game)
+  end
+
+  def self.show_available_games
+    @avail_games.map { |f| puts "\t* #{f.gsub(/\.yaml/, '')}" }
+    print "\nEnter one of the above games: "
   end
 
   def to_yaml
@@ -79,11 +100,6 @@ class Game
       answer = gets.chomp.upcase.strip
     end
     @@loaded_game = false # starting new game, option to load after
-    answer == 'Y' ? Game.start_new_game : exit
-  end
-
-  def self.show_goodbye_message
-    puts "\n* Goodbye, thanks for playing! *\n".colorize(:magenta)
-    exit
+    answer == 'Y' ? start_new_game : exit
   end
 end
