@@ -1,5 +1,12 @@
 # frozen_string_literal: true
 
+require 'bundler/inline'
+
+gemfile true do
+  source 'http://rubygems.org'
+  gem 'colorize'
+end
+
 require 'yaml'
 require 'colorize'
 require_relative 'lib/game.rb'
