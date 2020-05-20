@@ -100,6 +100,11 @@ class Game
       answer = gets.chomp.upcase.strip
     end
     @@loaded_game = false # starting new game, option to load after
-    answer == 'Y' ? start_new_game : exit
+    if answer == 'Y'
+      start_new_game
+    else
+      Display.show_goodbye_message
+      exit
+    end
   end
 end
