@@ -3,4 +3,4 @@ Number of guesses allowed = (the length of the word * 2), e.g. a 10 letter word 
 
 Details here: https://www.theodinproject.com/courses/ruby-programming/lessons/file-i-o-and-serialization
 
-[![Run on Repl.it](https://repl.it/@TenaciousQi/hangman-5#README.md)
+[Run on Repl.it](https://repl.it/@TenaciousQi/hangman-5#README.md)
